@@ -21,6 +21,7 @@ process DRAW_R4RNA {
     def args = task.ext.args ?: ''
     def plot_dir = "plots_r4rna_${alignments.baseName}"
     """
+    export PYTHONPATH="${projectDir}/bin"
     mkdir -p ${plot_dir}
     plot_r4rna.py \\
         --alignments ${alignments} \\

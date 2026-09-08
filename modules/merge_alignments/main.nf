@@ -25,6 +25,7 @@ process MERGE_ALIGNMENTS {
     def tsv_arg = alignments instanceof Collection && alignments.isEmpty() ? '' : '--alignments aln_tsv/*'
     def txt_arg = texts instanceof Collection && texts.isEmpty() ? '' : '--alignment-text aln_txt/*'
     """
+    export PYTHONPATH="${projectDir}/bin"
     merge_alignments.py \\
         ${tsv_arg} \\
         ${txt_arg} \\

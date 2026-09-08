@@ -32,6 +32,7 @@ process DRAW_SW {
     def args = task.ext.args ?: ''
     def plot_dir = "plots_sw_${alignments.baseName}"
     """
+    export PYTHONPATH="${projectDir}/bin"
     mkdir -p ${plot_dir}
     plot_sw.py \\
         --alignments ${alignments} \\

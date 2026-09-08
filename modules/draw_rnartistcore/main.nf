@@ -21,6 +21,7 @@ process DRAW_RNARTISTCORE {
     def args = task.ext.args ?: ''
     def plot_dir = "plots_rnartistcore_${alignments.baseName}"
     """
+    export PYTHONPATH="${projectDir}/bin"
     mkdir -p ${plot_dir}
     plot_rnartistcore.py \\
         --alignments ${alignments} \\
