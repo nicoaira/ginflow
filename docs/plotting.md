@@ -55,8 +55,10 @@ Uses the GINFINITY-SW container (no extra image). The traceback uses
 ## How many plots
 
 `--plot_max_pairs` (default 25) counts **unique query–target pairs per
-query**, not HSP rows and not SVG files. Every HSP belonging to a
-selected pair is rendered, so the SVG count can be larger than 25.
+query**, not HSP rows and not SVG files. Pairs are ranked by the same
+deduplicated total HSP score used for the merged alignment table, so the
+highest-ranked report pairs are plotted first. Every surviving HSP belonging
+to a selected pair is rendered, so the SVG count can be larger than 25.
 
 Each query gets its own draw task. Draw processes use `task.cpus`
 workers (6 with the default `process_medium` label).

@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- Duplicate or overlapping local HSP tracebacks are now removed before pair
+  scores and E-values are summed.
+- Structure and SW plots now select pairs in merged report-ranking order,
+  while retaining every surviving HSP for each selected pair.
 - `--exact_rerank false` now skips `RERANK_CANDIDATES` on Nextflow 26. The CLI value was a Groovy-truthy string, and writing `params.exact_rerank = false` is ignored.
 - `--exact_rerank false` with `--quantize pq|opq` no longer applies `--seed_min_similarity` to ADC scores (those are not cosine; a 0.6 cutoff dropped every 30k-PQ hit). Search keeps the top `--seed_k` neighbours.
 

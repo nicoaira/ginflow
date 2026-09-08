@@ -110,7 +110,9 @@ is not a subset of `--input`.
 
 `--plot_backend` defaults to `none` and `--plot_sw` defaults to
 `false`. Plots are also capped by `--plot_max_pairs` (25 unique pairs
-**per query**).
+**per query**), ranked by the merged pair score used in the report. Duplicate
+or overlapping HSPs are removed before pair scores and plot selection are
+computed.
 
 ### Nextflow version too old
 

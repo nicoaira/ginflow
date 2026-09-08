@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "bin"))
+from hsp_utils import deduplicate_hsps_by_pair  # noqa: E402
 from merge_alignments import aggregate_pair, aggregate_rows  # noqa: E402
 
 
@@ -63,6 +64,33 @@ class TestMergeAlignments(unittest.TestCase):
         query_target = next(row for row in merged if row["target_id"] == "target")
         self.assertEqual(query_target["cluster_ids"], "a,b")
         self.assertEqual(query_target["hsp_scores"], "[10.0,6.0]")
+
+    def test_duplicate_and_overlapping_hsps_are_not_summed(self) -> None:
+        rows = [
+            hsp("97", 6.36691, 0, 0),
+            hsp("98", 6.36691, 0, 0),
+            hsp("overlap", 5.0, 5, 5),
+            hsp("99", 5.6833, 20, 20),
+        ]
+        result = aggregate_pair(
+            rows,
+            {"lambda": 1.0, "K": 1.0, "database_residues": 100},
+        )
+
+        self.assertEqual(result["cluster_ids"], "97,99")
+        self.assertEqual(result["alignment_count"], "2")
+        self.assertEqual(result["hsp_scores"], "[6.36691,5.6833]")
+        self.assertAlmostEqual(float(result["total_score"]), 12.0502)
+
+    def test_deduplication_does_not_cross_query_target_pairs(self) -> None:
+        rows = [
+            hsp("same-coordinates", 10, 0, 0),
+            {**hsp("other-pair", 9, 0, 0), "target_id": "other"},
+        ]
+
+        kept = deduplicate_hsps_by_pair(rows)
+
+        self.assertEqual([row["cluster_id"] for row in kept], ["same-coordinates", "other-pair"])
 
 
 if __name__ == "__main__":

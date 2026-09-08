@@ -9,6 +9,8 @@ import math
 import re
 from pathlib import Path
 
+from hsp_utils import deduplicate_hsps, deduplicate_hsps_by_pair
+
 
 CLUSTER_HEAD = re.compile(
     r"^# cluster\s+(\S+)\s+(\S+)\s+vs\s+(\S+)",
@@ -203,6 +205,7 @@ def aggregate_pair(
 ) -> dict[str, str]:
     if not rows:
         raise ValueError("cannot aggregate an empty query-target group")
+    rows = deduplicate_hsps(rows)
     ordered = sorted(
         rows,
         key=lambda row: (
@@ -386,7 +389,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
-        rows = load_rows(args.alignments)
+        rows = deduplicate_hsps_by_pair(load_rows(args.alignments))
         evd = load_evd(args.evd)
         merged = aggregate_rows(rows, evd)
     except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
@@ -421,7 +424,7 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     print(
-        f"merged {len(rows)} HSPs into {len(merged)} query-target pairs "
+        f"deduplicated and merged {len(rows)} HSPs into {len(merged)} query-target pairs "
         f"from {len(args.alignments)} tables"
     )
     return 0

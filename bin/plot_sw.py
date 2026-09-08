@@ -16,6 +16,7 @@ import numpy as np
 from ginfinity_sw import ScoringParameters, align, similarity_matrix, transform_scores
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from hsp_utils import select_merged_pair_rows  # noqa: E402
 from alignment_parameters import add_scoring_arguments, scoring_parameters_from_args  # noqa: E402
 from record_pack import load_embedding_files, load_residue_embeddings  # noqa: E402
 
@@ -333,19 +334,8 @@ def plot_hit(
 def selected_pair_rows(
     rows: list[dict[str, str]], max_pairs: int
 ) -> list[tuple[int, dict[str, str]]]:
-    """Select whole query-target pairs, retaining every HSP in each pair."""
-    groups: dict[tuple[str, str], list[tuple[int, dict[str, str]]]] = {}
-    order: list[tuple[str, str]] = []
-    for index, row in enumerate(rows):
-        key = (row.get("query_id", ""), row.get("target_id", ""))
-        if key not in groups:
-            groups[key] = []
-            order.append(key)
-        groups[key].append((index, row))
-    selected: list[tuple[int, dict[str, str]]] = []
-    for key in order[:max_pairs]:
-        selected.extend(groups[key])
-    return selected
+    """Select deduplicated HSPs from the highest-scoring merged pairs."""
+    return select_merged_pair_rows(rows, max_pairs)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:

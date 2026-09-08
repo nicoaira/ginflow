@@ -27,22 +27,22 @@ from plot_sw import selected_pair_rows as sw_selected_pair_rows  # noqa: E402
 
 
 class TestPlotPairSelection(unittest.TestCase):
-    def test_limit_is_unique_pairs_and_retains_every_hsp(self) -> None:
+    def test_limit_uses_merged_pair_score_and_retains_deduplicated_hsps(self) -> None:
         rows = [
-            {"query_id": "q1", "target_id": "t1", "cluster_id": "a"},
-            {"query_id": "q1", "target_id": "t1", "cluster_id": "b"},
-            {"query_id": "q1", "target_id": "t1", "cluster_id": "c"},
-            {"query_id": "q2", "target_id": "t2", "cluster_id": "d"},
-            {"query_id": "q3", "target_id": "t3", "cluster_id": "e"},
+            {"query_id": "q1", "target_id": "low", "cluster_id": "low", "score": "5", "query_start": "0", "query_end": "10", "target_start": "0", "target_end": "10"},
+            {"query_id": "q1", "target_id": "high", "cluster_id": "high-1", "score": "8", "query_start": "20", "query_end": "30", "target_start": "20", "target_end": "30"},
+            {"query_id": "q1", "target_id": "high", "cluster_id": "high-2", "score": "7", "query_start": "40", "query_end": "50", "target_start": "40", "target_end": "50"},
+            {"query_id": "q1", "target_id": "high", "cluster_id": "duplicate", "score": "6", "query_start": "20", "query_end": "30", "target_start": "20", "target_end": "30"},
+            {"query_id": "q1", "target_id": "middle", "cluster_id": "middle", "score": "10", "query_start": "60", "query_end": "70", "target_start": "60", "target_end": "70"},
         ]
-        expected = [(0, "a"), (1, "b"), (2, "c"), (3, "d")]
+        expected = [(1, "high-1"), (2, "high-2")]
 
         for selector in (
             rnartist_selected_pair_rows,
             r4_selected_pair_rows,
             sw_selected_pair_rows,
         ):
-            selected = selector(rows, 2)
+            selected = selector(rows, 1)
             self.assertEqual(
                 [(index, row["cluster_id"]) for index, row in selected],
                 expected,
