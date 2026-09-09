@@ -31,7 +31,14 @@ def unique_stem(query_id: str, used: dict[str, str]) -> str:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", "--alignments", dest="input", type=Path, required=True)
+    parser.add_argument(
+        "--input",
+        "--alignments",
+        dest="input",
+        type=Path,
+        nargs="+",
+        required=True,
+    )
     parser.add_argument("--outdir", type=Path, required=True)
     return parser.parse_args(argv)
 
@@ -39,19 +46,23 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
-        with args.input.open(newline="") as handle:
-            reader = csv.DictReader(handle, delimiter="\t")
-            if reader.fieldnames is None or "query_id" not in reader.fieldnames:
-                raise ValueError(f"{args.input} must have a query_id column")
-            fieldnames = list(reader.fieldnames)
-            groups: dict[str, list[dict[str, str]]] = {}
-            order: list[str] = []
-            for row in reader:
-                query_id = row.get("query_id", "")
-                if query_id not in groups:
-                    groups[query_id] = []
-                    order.append(query_id)
-                groups[query_id].append(row)
+        fieldnames: list[str] = []
+        groups: dict[str, list[dict[str, str]]] = {}
+        order: list[str] = []
+        for input_path in args.input:
+            with input_path.open(newline="") as handle:
+                reader = csv.DictReader(handle, delimiter="\t")
+                if reader.fieldnames is None or "query_id" not in reader.fieldnames:
+                    raise ValueError(f"{input_path} must have a query_id column")
+                for name in reader.fieldnames:
+                    if name not in fieldnames:
+                        fieldnames.append(name)
+                for row in reader:
+                    query_id = row.get("query_id", "")
+                    if query_id not in groups:
+                        groups[query_id] = []
+                        order.append(query_id)
+                    groups[query_id].append(row)
     except (OSError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

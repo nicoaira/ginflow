@@ -45,7 +45,6 @@
 %%metro process: search_index | SEARCH_(FAISS|CUVS|PQ_CAGRA|HNSWLIB)
 %%metro process: rerank | RERANK_CANDIDATES
 %%metro process: cluster_seeds | CLUSTER_SEEDS
-%%metro process: split_clusters | SPLIT_CLUSTERS
 %%metro process: align_clusters | ALIGN_CLUSTERS
 %%metro process: merge_alignments | MERGE_ALIGNMENTS
 %%metro process: plot_alignments | DRAW_(RNARTISTCORE|R4RNA|SW)
@@ -101,11 +100,10 @@ graph LR
         search_index[Search index]
         rerank[Rerank]
         cluster_seeds[Cluster seeds]
-        split_clusters[Split clusters]
         index_in -->|existing| search_index
         search_index -->|search,existing| rerank
         rerank -->|search,existing| cluster_seeds
-        cluster_seeds -->|search,existing| split_clusters
+        cluster_seeds -->|search,existing| align_clusters
     end
 
     subgraph align [Align]
@@ -133,5 +131,4 @@ graph LR
     q_windows -->|search,existing| search_index
     q_qwindows -->|search,existing| search_index
     estimate_evd -->|search| search_index
-    split_clusters -->|search,existing| align_clusters
     merge_alignments -->|search,existing| plot_alignments

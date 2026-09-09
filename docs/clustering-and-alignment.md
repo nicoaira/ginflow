@@ -9,8 +9,7 @@ makes one BLAST-style result per query–target pair.
 seeds/seeds.tsv
     → CLUSTER_SEEDS          (diagonal boxes)
     → ALIGN_CLUSTERS         (one HSP row per cluster; all queries, N CPU threads)
-    → MERGE_ALIGNMENTS       (one row per query–target pair)
-    → SPLIT_CLUSTERS         (only when plotting; one file per query)
+    → MERGE_ALIGNMENTS       (one row per query–target pair; optional raw HSP tables per query for plots)
 ```
 
 ## Seeds

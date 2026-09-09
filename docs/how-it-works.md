@@ -192,7 +192,8 @@ Scoring is embedding cosine with the transform and affine-gap parameters
 configured in `nextflow.config` (`align_mu`, `align_sigma`,
 `align_gamma`, `align_score_min`, `align_score_max`, `align_gap_open`,
 `align_gap_extend`, and `align_score_offset`). The process emits **one
-row per cluster**. Plot processes still split that table per query.
+row per cluster**. When plotting is enabled, `MERGE_ALIGNMENTS` also emits
+one raw-HSP table per query for the plotting processes.
 
 `MERGE_ALIGNMENTS` is the pair-level boundary: every HSP for the same
 query and target becomes one BLAST-style result with `total_score`

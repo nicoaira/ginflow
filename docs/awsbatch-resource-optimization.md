@@ -165,7 +165,6 @@ cached rows are not treated as measurements.
 | `CLUSTER_SEEDS` | 1 | 0.82 s | 14 MB | 98% |
 | `ALIGN_CLUSTERS` | 20 | 3.6 s | 316 MB p95 | 288% |
 | `MERGE_ALIGNMENTS` | 1 | 0.60 s | 14 MB | 93% |
-| `SPLIT_ALIGNMENTS` | 1 | 0.40 s | 14 MB | 84% |
 | `DRAW_R4RNA` | 20 | 0.52 s | 14 MB | 99% |
 | `WRITE_REPORT` | 1 | 0.71 s | 15 MB | 96% |
 

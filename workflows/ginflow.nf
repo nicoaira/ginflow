@@ -13,7 +13,6 @@ include { CLUSTER_SEEDS }                    from '../modules/cluster_seeds/main
 include { ALIGN_CLUSTERS }                   from '../modules/align_clusters/main'
 include { ESTIMATE_EVD as ESTIMATE_EVD_BUILD } from '../modules/estimate_evd/main'
 include { ESTIMATE_EVD as ESTIMATE_EVD_QUERY } from '../modules/estimate_evd/main'
-include { SPLIT_ALIGNMENTS as SPLIT_CLUSTERS } from '../modules/split_alignments/main'
 include { MERGE_ALIGNMENTS }                 from '../modules/merge_alignments/main'
 include { DRAW_RNARTISTCORE }                from '../modules/draw_rnartistcore/main'
 include { DRAW_R4RNA }                       from '../modules/draw_r4rna/main'
@@ -389,34 +388,32 @@ workflow GINFLOW {
         )
         ch_versions = ch_versions.mix(ALIGN_CLUSTERS.out.versions)
 
+        def plot_rn = params.plot_backend in ['rnartistcore', 'both']
+        def plot_r4 = params.plot_backend in ['r4rna', 'both']
+        def plot_enabled = plot_rn || plot_r4 || params.plot_sw
         MERGE_ALIGNMENTS(
             ALIGN_CLUSTERS.out.alignments.collect().ifEmpty([]),
             ALIGN_CLUSTERS.out.text.collect().ifEmpty([]),
-            ch_evd.collect()
+            ch_evd.collect(),
+            plot_enabled
         )
         ch_versions       = ch_versions.mix(MERGE_ALIGNMENTS.out.versions)
         ch_alignments     = MERGE_ALIGNMENTS.out.alignments
         ch_alignment_text = MERGE_ALIGNMENTS.out.text
 
-        def plot_rn = params.plot_backend in ['rnartistcore', 'both']
-        def plot_r4 = params.plot_backend in ['r4rna', 'both']
-        if (plot_rn || plot_r4 || params.plot_sw) {
-            SPLIT_CLUSTERS(ALIGN_CLUSTERS.out.alignments)
-            ch_versions = ch_versions.mix(SPLIT_CLUSTERS.out.versions)
-        }
         if (plot_rn) {
-            DRAW_RNARTISTCORE(SPLIT_CLUSTERS.out.alignments.flatten())
+            DRAW_RNARTISTCORE(MERGE_ALIGNMENTS.out.plot_alignments.flatten())
             ch_versions       = ch_versions.mix(DRAW_RNARTISTCORE.out.versions)
             ch_plots_rnartist = DRAW_RNARTISTCORE.out.plots.collect()
         }
         if (plot_r4) {
-            DRAW_R4RNA(SPLIT_CLUSTERS.out.alignments.flatten())
+            DRAW_R4RNA(MERGE_ALIGNMENTS.out.plot_alignments.flatten())
             ch_versions    = ch_versions.mix(DRAW_R4RNA.out.versions)
             ch_plots_r4rna = DRAW_R4RNA.out.plots.collect()
         }
         if (params.plot_sw) {
             DRAW_SW(
-                SPLIT_CLUSTERS.out.alignments.flatten(),
+                MERGE_ALIGNMENTS.out.plot_alignments.flatten(),
                 CLUSTER_SEEDS.out.clusters,
                 ch_query_embeddings.map { meta, npz, manifest -> npz }.collect(),
                 ch_search_database.collect(),

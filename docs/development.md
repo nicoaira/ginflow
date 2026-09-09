@@ -66,7 +66,6 @@ nf-test test tests/default.nf.test \
   modules/draw_rnartistcore/tests/main.nf.test \
   modules/draw_r4rna/tests/main.nf.test \
   modules/draw_sw/tests/main.nf.test \
-  modules/split_alignments/tests/main.nf.test \
   modules/merge_alignments/tests/main.nf.test \
   modules/write_report/tests/main.nf.test \
   --profile +docker

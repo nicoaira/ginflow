@@ -32,6 +32,26 @@ nextflow_pipeline {
         }
     }
 
+    test("routes per-query alignment tables to plotting processes") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir       = "$outputDir"
+                input        = "${projectDir}/tests/data/smoke_test_structures.tsv"
+                query        = "${projectDir}/tests/data/smoke_test_structures.tsv"
+                shard_size   = 2
+                plot_backend = 'rnartistcore'
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert path("${params.outdir}/plots/rnartistcore/plots_rnartistcore_query/.stub").exists()
+        }
+    }
+
     test("supports mixed CPU and GPU device selection") {
 
         options "-stub"
